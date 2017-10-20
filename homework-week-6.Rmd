@@ -24,8 +24,11 @@ The function should return a list containing:
 
 ```{r function part 1, one sample prop test}
 Z.prop.test<-function(p1, n1, p2=NULL, n2=NULL, p0, alternative="two.sided", conf.level=0.95) {
-#one sample test
+  
     if(is.null(p2)||is.null(n2)) {
+      
+  #one sample test      
+if ((n1∗p1<=5) | n1∗(1−p1)<=5) warning("Warning: failed one or more validity tests, data may not be normally distributed") #in the module, this is given here refering to pi, not p-hat, but Davies (2016) writes this with p-hat.      
     if (alternative == "two.sided") {
       z <- (p1 - p0)/sqrt(p0 * (1 - p0)/n1)
       p <- 1 - pnorm(z, lower.tail = TRUE) + pnorm(z, lower.tail = FALSE)
@@ -35,7 +38,7 @@ Z.prop.test<-function(p1, n1, p2=NULL, n2=NULL, p0, alternative="two.sided", con
     }
   
     if (alternative =="greater") {
-      if (p1<p0) stop ("p0>p1, use alternative='lesser'")
+      if (p1<p0) stop ("p0>p1, use alternative='less'")
     z <- (p1 - p0)/sqrt(p0 * (1 - p0)/n1)
     p <- pnorm(z, lower.tail=FALSE)
     lower <- p1 - qnorm((1 - (1 - conf.level)/2)) * sqrt(p1 * (1 - p1)/n1)
@@ -43,7 +46,7 @@ Z.prop.test<-function(p1, n1, p2=NULL, n2=NULL, p0, alternative="two.sided", con
     ci <- c(lower, upper)
     }
     
-    if (alternative =="lesser") {
+    if (alternative =="less") {
       if (p1>p0) stop ("p1>p0, use alternative='greater'")
     z <- (p1-p0)/sqrt(p0 * (1 - p0)/n1)
     p <- pnorm(z, lower.tail=TRUE)
@@ -54,6 +57,9 @@ Z.prop.test<-function(p1, n1, p2=NULL, n2=NULL, p0, alternative="two.sided", con
     }
   else{
   #two sample test
+    
+    if ((n1∗p1<=5) | n1∗(1−p1)<=5 | (n2∗p2<=5) | n2∗(1−p2)<=5) warning ("Warning: failed one or more validity tests, data may not be normally distributed") #in the module, this is given here refering to pi, not p-hat, but Davies (2016) writes this with p-hat.
+    
     if (alternative == "two.sided") {
   pstar<-(p1 * n1 + p2 * n2) / (n1 + n2)
   z <- (p2 - p1)/sqrt((pstar * (1 - pstar)) * (1/n1 + 1/n2))
@@ -64,7 +70,7 @@ Z.prop.test<-function(p1, n1, p2=NULL, n2=NULL, p0, alternative="two.sided", con
     }
   
     if (alternative =="greater") {
-      if (p1>p2) stop ("p2>p1, use alternative='lesser'")
+      if (p1>p2) stop ("p2>p1, use alternative='less'")
    
   pstar<-(p1 * n1 + p2 * n2) / (n1 + n2)
   z <- (p2 - p1)/sqrt((pstar * (1 - pstar)) * (1/n1 + 1/n2))
@@ -75,7 +81,7 @@ Z.prop.test<-function(p1, n1, p2=NULL, n2=NULL, p0, alternative="two.sided", con
       
     }
     
-  if (alternative =="lesser") {
+  if (alternative =="less") {
     if (p1<p2) stop ("p1>p2, use alternative='greater'")
       pstar<-(p1 * n1 + p2 * n2) / (n1 + n2)
       z <- (p2 - p1)/sqrt((pstar * (1 - pstar)) * (1/n1 + 1/n2))
@@ -97,10 +103,17 @@ Z.prop.test<-function(p1, n1, p2=NULL, n2=NULL, p0, alternative="two.sided", con
 
 ```{r}
 Z.prop.test(p1=0.56, p2=0.7, n1=25, n2=30, alternative="two.sided")
+Z.prop.test(p1=0.56, p2=0.7, n1=25, n2=30, alternative="greater")
+Z.prop.test(p1=0.56, p2=1, n1=25, n2=30, alternative="greater")
+```
+```{r}
+Z.prop.test(p1=0.6, p0=0.8, n1=30)
+Z.prop.test(p1=0.9, p0=0.8, n1=10, alternative = "greater")
+```
+
 ```
 **TO DO**
-- Check that two sample alternative greater and less work
-- change lesser to less
+
 - add in additional warnings
 
 ```{r}
