@@ -119,7 +119,9 @@ Fit the regression model and, using {ggplot2}, produce a scatterplot with the fi
 
 
 Identify and interpret the point estimate of the slope (β1β1), as well as the outcome of the test associated with the hypotheses H0: β1β1 = 0; HA: β1β1 ≠ 0. Also, find a 90 percent CI for the slope (β1β1) parameter.
+
 Using your model, add lines for the 90 percent confidence and prediction interval bands on the plot and add a legend to differentiate between the lines.
+
 Produce a point estimate and associated 90 percent PI for the longevity of a species whose brain weight is 800 gm. Do you trust the model to predict observations accurately for this value of the explanatory variable? Why or why not?
 Looking at your two models, which do you think is better? Why?
 ```{r}
@@ -167,19 +169,17 @@ g <- g + geom_text(aes(x = 2, y = 50, label = rout[[1]]), hjust = 0) +
    geom_text(aes(x = 2, y = 0, label = rout[[2]]), hjust = 0, parse = TRUE)
 g
 ```
-The slope β1 is 1.218 which suggests that for every increase of 1 gram of brain weight, longevity of the species is predicted to increase by 1.218 months. This demonstrates there is a positive relationship between these two variables and supports the alternative hypothesis that β1 does not equal 0. Based on the R squared value, this relationship describes roughly 49% of the variation between these two variables.
+**##Identify and interpret the point estimate of the slope (β1), as well as the outcome of the test associated with the hypotheses H0: β1 = 0; HA: β1 ≠ 0. Also, find a 90 percent CI for the slope (β1) parameter.**
+
+The slope β1 is 1.218 which suggests that for every increase of 1 gram of brain weight, longevity of the species is predicted to increase by 1.218 months. This demonstrates there is a positive relationship between these two variables and supports the alternative hypothesis that β1 does not equal 0 (p<0.0001). Based on the R squared value, the variation in brainsize describes roughly 49% of the variation in longevity.
+```{r}
+summary(m)
+```
 ```{r}
 ci <- confint(m, level = 0.90)  # using the results of lm()
 ci
 ```
-The 90% confidence interval for β1 is 1.04-1.4
-
-
-
-
-
-
-
+The 90% confidence interval for β1 suggests there is a 90 percent chance the true mean of the slope for brainweight and longevity is between is 1.04-1.4.
 
 
 ```{r}
@@ -191,6 +191,31 @@ g <- g + geom_text(aes(x = 1, y = 4.4, label = rout2[[1]]), hjust = 0) +
    geom_text(aes(x = 1, y = 4.25, label = rout2[[2]]), hjust = 0, parse = TRUE)
 g
 ```
+**##Identify and interpret the point estimate of the slope (β1), as well as the outcome of the test associated with the hypotheses H0: β1 = 0; HA: β1 ≠ 0. Also, find a 90 percent CI for the slope (β1) parameter.**
 
-##Identify and interpret the point estimate of the slope (β1), as well as the outcome of the test associated with the hypotheses H0: β1 = 0; HA: β1 ≠ 0. Also, find a 90 percent CI for the slope (β1) parameter.
+In the log regression model, the slope is 0.234, which suggests for every 1 increase of log brain size, log lengivity increases by 0.234. This relationship with log brainsize explains about 58 % of the variation in loglongevity. This too is a positive relationship between the two variables which is significant (p<0.0001).The 90% confidence interval is 0.205 - 0.264, which means it is 90% likely that the true mean of the slope is between these two values. 
 
+```{r}
+summary(m2)
+```
+
+```{r}
+ci <- confint(m2, level = 0.90)  # using the results of lm()
+ci
+```
+
+**Using your model, add lines for the 90 percent confidence and prediction interval bands on the plot and add a legend to differentiate between the lines.**
+
+
+```{r}
+v <- seq(from = 100, to = 500, by = 5)
+m <- lm(data = d, MaxLongevity_m ~ d$Brain_Size_Species_Mean)
+ci <- predict(m, newdata = data.frame(brainsize = v), interval = "confidence", level = 0.90)
+pi <- predict(m, newdata = data.frame(brainsize = v), interval = "prediction", level = 0.90)
+plot(data = d, MaxLongevity_m~ Brain_Size_Species_Mean)
+lines(x = v, y = ci[, 1], col = "black")
+lines(x = v, y = ci[, 2], col = "blue")
+lines(x = v, y = ci[, 3], col = "blue")
+lines(x = v, y = pi[, 2], col = "red")
+lines(x = v, y = pi[, 3], col = "red")
+```
