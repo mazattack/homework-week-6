@@ -208,14 +208,51 @@ ci
 
 
 ```{r}
-v <- seq(from = 100, to = 500, by = 5)
-m <- lm(data = d, MaxLongevity_m ~ d$Brain_Size_Species_Mean)
-ci <- predict(m, newdata = data.frame(brainsize = v), interval = "confidence", level = 0.90)
-pi <- predict(m, newdata = data.frame(brainsize = v), interval = "prediction", level = 0.90)
+v <- seq(from = 0, to = 500, by = 5)
+m<- lm(data = d, MaxLongevity_m ~ Brain_Size_Species_Mean)
+ci <- predict(m, newdata = data.frame(Brain_Size_Species_Mean = v), interval = "confidence", level = 0.90)
+pi <- predict(m, newdata = data.frame(Brain_Size_Species_Mean = v), interval = "prediction", level = 0.90)
 plot(data = d, MaxLongevity_m~ Brain_Size_Species_Mean)
 lines(x = v, y = ci[, 1], col = "black")
 lines(x = v, y = ci[, 2], col = "blue")
 lines(x = v, y = ci[, 3], col = "blue")
 lines(x = v, y = pi[, 2], col = "red")
 lines(x = v, y = pi[, 3], col = "red")
+legend("bottomright", legend = c("90% confidence interval of sample slope", "expected range of longevity given brainsize (90% CI)"),  col=c("blue","red"), lty=c(1,1))
 ```
+
+**Produce a point estimate and associated 90 percent PI for the longevity of a species whose brain weight is 800 gm. Do you trust the model to predict observations accurately for this value of the explanatory variable? Why or why not? Looking at your two models, which do you think is better? Why?**
+
+```{r}
+ci <- predict(m, newdata = data.frame(Brain_Size_Species_Mean = 800), interval = "confidence", 
+    level = 0.90)
+ci
+```
+The model predicts that a species with average brainweight of 800gm will have a longevity of 1223 months, and suggests that 90% of the time, the average longevity of a species with 800gm brain weight will fall between 1089 and 1357 months. 
+
+
+**Using your model, add lines for the 90 percent confidence and prediction interval bands on the plot and add a legend to differentiate between the lines.**
+```{r}
+v <- seq(from = 0, to = 7, by = .25)
+logs<-cbind.data.frame("logbrainsize"=log(d$Brain_Size_Species_Mean), "loglongevity"=log(d$MaxLongevity_m))
+m2<- lm(data = logs, loglongevity~logbrainsize)
+ci <- predict(m2, newdata = data.frame(logbrainsize = v), interval = "confidence", level = 0.90)
+pi <- predict(m2, newdata = data.frame(logbrainsize = v), interval = "prediction", level = 0.90)
+plot(data = logs, loglongevity~ logbrainsize)
+lines(x = v, y = ci[, 1], col = "black")
+lines(x = v, y = ci[, 2], col = "blue")
+lines(x = v, y = ci[, 3], col = "blue")
+lines(x = v, y = pi[, 2], col = "red")
+lines(x = v, y = pi[, 3], col = "red")
+legend("bottomright", legend = c("90% confidence interval of sample slope", "expected range of longevity given brainsize (90% CI)"),  col=c("blue","red"), lty=c(1,1))
+```
+
+**Produce a point estimate and associated 90 percent PI for the longevity of a species whose brain weight is 800 gm. Do you trust the model to predict observations accurately for this value of the explanatory variable? Why or why not? Looking at your two models, which do you think is better? Why?**
+
+```{r}
+ci <- predict(m2, newdata = data.frame(logbrainsize = log(800)), interval = "confidence", level = 0.90)
+ci
+exp(ci)
+```
+The model predicts that a species with average brain weight of 800gm will have a longevity of 629 months, and suggests that 90% of the time, the average longevity of a species with 800gm brain weight will fall between 571 and 692 months. This model is likely more accurate, as the relationship describe in the log values accounts for more of the variation, suggesting that perhaps the data were not normally distributed and/or the relationship not linear. 
+
